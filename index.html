@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兒童趣味數學大冒險 🎈</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Comic Neue for friendly numbers and text -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Comic Neue', 'Noto Sans TC', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 活潑繽紛的背景與彈跳動畫 */
+        .bg-pattern {
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#bbf7d0 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        .btn-bounce {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-bounce:active {
+            transform: scale(0.92);
+        }
+
+        .pop-in {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .star-shine {
+            animation: spinShine 3s infinite linear;
+        }
+
+        @keyframes spinShine {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.15); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* 慶祝彩色屑屑動畫 */
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: confettiFall 2.5s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 text-gray-800">
+
+    <!-- 頂部標題與積分面板 -->
+    <header class="w-full max-w-2xl flex flex-col sm:flex-row justify-between items-center bg-white rounded-3xl p-4 shadow-lg border-4 border-yellow-300 gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-yellow-400 p-3 rounded-2xl shadow-inner text-3xl">
+                🐱
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-black text-indigo-600 tracking-wide">數學小探險家</h1>
+                <p class="text-sm font-bold text-gray-400">專為 6 歲打造的趣味練習</p>
+            </div>
+        </div>
+
+        <!-- 獎勵積分條 -->
+        <div class="flex items-center gap-4 bg-amber-50 px-5 py-2 rounded-2xl border-2 border-amber-200">
+            <div class="flex items-center gap-1">
+                <i class="fa-solid fa-star text-amber-400 text-3xl star-shine"></i>
+                <span id="star-count" class="text-3xl font-black text-amber-600">0</span>
+            </div>
+            <div class="h-8 w-0.5 bg-amber-200"></div>
+            <div class="flex items-center gap-1">
+                <i class="fa-solid fa-award text-purple-500 text-3xl"></i>
+                <span id="badge-count" class="text-3xl font-black text-purple-600">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 模式選擇畫面 (預設顯示) -->
+    <main id="mode-selection" class="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-indigo-200 my-auto text-center pop-in">
+        <h2 class="text-2xl sm:text-3xl font-black text-indigo-700 mb-6">請選擇今天的冒險模式：</h2>
+        
+        <div class="grid grid-cols-2 gap-4 sm:gap-6">
+            <button onclick="startGame('add')" class="btn-bounce bg-pink-400 hover:bg-pink-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-pink-600 flex flex-col items-center justify-center gap-2">
+                <span class="text-5xl">➕</span>
+                <span class="text-2xl font-black">加法 (1-20)</span>
+            </button>
+
+            <button onclick="startGame('sub')" class="btn-bounce bg-sky-400 hover:bg-sky-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-sky-600 flex flex-col items-center justify-center gap-2">
+                <span class="text-5xl">➖</span>
+                <span class="text-2xl font-black">減法 (1-20)</span>
+            </button>
+
+            <button onclick="startGame('mul')" class="btn-bounce bg-emerald-400 hover:bg-emerald-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-emerald-600 flex flex-col items-center justify-center gap-2">
+                <span class="text-5xl">✖️</span>
+                <span class="text-2xl font-black">乘法 (九九乘法)</span>
+            </button>
+
+            <button onclick="startGame('mix')" class="btn-bounce bg-purple-400 hover:bg-purple-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-purple-600 flex flex-col items-center justify-center gap-2">
+                <span class="text-5xl">🎲</span>
+                <span class="text-2xl font-black">綜合大挑戰</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- 遊戲練習畫面 (預設隱藏) -->
+    <main id="game-screen" class="hidden w-full max-w-2xl bg-white rounded-3xl p-4 sm:p-6 shadow-xl border-4 border-indigo-200 my-auto flex-col items-center gap-6 pop-in relative overflow-hidden">
+        
+        <!-- 返回按鈕與模式提示 -->
+        <div class="w-full flex justify-between items-center">
+            <button onclick="showMenu()" class="btn-bounce bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-4 py-2 rounded-2xl flex items-center gap-2 text-lg">
+                <i class="fa-solid fa-arrow-left"></i> 換模式
+            </button>
+            <span id="current-mode-label" class="text-xl font-black text-indigo-500 bg-indigo-50 px-4 py-1 rounded-full border border-indigo-200">
+                加法模式
+            </span>
+        </div>
+
+        <!-- 題目與算式區域 -->
+        <div class="flex items-center justify-center gap-4 text-5xl sm:text-6xl font-black text-indigo-900 my-2">
+            <span id="num1" class="bg-indigo-50 px-4 py-2 rounded-2xl border-2 border-indigo-100">8</span>
+            <span id="operator" class="text-pink-500">+</span>
+            <span id="num2" class="bg-indigo-50 px-4 py-2 rounded-2xl border-2 border-indigo-100">5</span>
+            <span class="text-gray-400">=</span>
+            <div id="user-answer" class="w-20 h-20 sm:w-24 sm:h-24 bg-yellow-100 border-4 border-dashed border-yellow-400 rounded-2xl flex items-center justify-center text-yellow-700 font-black text-5xl shadow-inner">
+                ?
+            </div>
+        </div>
+
+        <!-- 視覺輔助點數/星星 (Counting Helpers) -->
+        <div class="w-full bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 flex flex-col items-center gap-2">
+            <div class="text-sm font-bold text-gray-500 flex items-center gap-1">
+                💡 數一數小星星幫忙算算看：（可以點擊星星數數喔！）
+            </div>
+            <div id="visual-helpers" class="flex flex-wrap justify-center gap-2 max-h-36 overflow-y-auto p-2 w-full">
+                <!-- 由 JavaScript 動態生成星星輔助點 -->
+            </div>
+        </div>
+
+        <!-- 數字鍵盤 (Numpad) -->
+        <div class="grid grid-cols-3 gap-3 w-full max-w-md">
+            <button onclick="pressNum(1)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">1</button>
+            <button onclick="pressNum(2)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">2</button>
+            <button onclick="pressNum(3)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">3</button>
+            <button onclick="pressNum(4)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">4</button>
+            <button onclick="pressNum(5)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">5</button>
+            <button onclick="pressNum(6)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">6</button>
+            <button onclick="pressNum(7)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">7</button>
+            <button onclick="pressNum(8)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">8</button>
+            <button onclick="pressNum(9)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">9</button>
+            <button onclick="clearAnswer()" class="btn-bounce bg-rose-400 hover:bg-rose-500 text-white font-black text-2xl py-4 rounded-2xl shadow-md border-b-4 border-rose-600">重填</button>
+            <button onclick="pressNum(0)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">0</button>
+            <button onclick="submitAnswer()" class="btn-bounce bg-emerald-500 hover:bg-emerald-600 text-white font-black text-2xl py-4 rounded-2xl shadow-md border-b-4 border-emerald-700">送出</button>
+        </div>
+    </main>
+
+    <!-- 答對獎勵彈窗 -->
+    <div id="correct-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-green-400 pop-in flex flex-col items-center gap-4">
+            <div class="text-7xl animate-bounce">🎉</div>
+            <h3 class="text-3xl font-black text-green-600">太棒了！答對囉！</h3>
+            <p class="text-lg text-gray-600 font-bold">你獲得了一顆金黃星星！⭐</p>
+            <button onclick="nextQuestion()" class="btn-bounce bg-green-500 hover:bg-green-600 text-white font-black text-2xl px-8 py-3 rounded-2xl shadow-lg border-b-4 border-green-700 w-full">
+                下一題 ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- 答錯提示彈窗 -->
+    <div id="wrong-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-amber-400 pop-in flex flex-col items-center gap-4">
+            <div class="text-7xl">🐥</div>
+            <h3 class="text-3xl font-black text-amber-600">差一點點！</h3>
+            <p class="text-lg text-gray-600 font-bold">別擔心，試著數數看下方的小星星再算一次喔！</p>
+            <button onclick="closeWrongModal()" class="btn-bounce bg-amber-500 hover:bg-amber-600 text-white font-black text-2xl px-8 py-3 rounded-2xl shadow-lg border-b-4 border-amber-700 w-full">
+                再試一次 💪
+            </button>
+        </div>
+    </div>
+
+    <!-- 頁尾資訊 -->
+    <footer class="text-center text-xs font-bold text-gray-400 mt-4">
+        專為幼兒數學啟蒙設計 • 輕鬆無壓力學習
+    </footer>
+
+    <script>
+        // 遊戲狀態變數
+        let currentMode = 'add'; // add, sub, mul, mix
+        let num1 = 0;
+        let num2 = 0;
+        let correctAnswer = 0;
+        let userInputValue = "";
+        let starCount = 0;
+        let badgeCount = 0;
+
+        // 音效（使用 Web Audio API 生成簡單活潑音效，不需外部檔案）
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                osc.frequency.exponentialRampToValueAtTime(174.61, audioCtx.currentTime + 0.2); // F3
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // 開始遊戲/切換模式
+        function startGame(mode) {
+            playSound('click');
+            currentMode = mode;
+            document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+            
+            // 更新模式標籤
+            const modeLabels = {
+                'add': '加法模式 (1-20)',
+                'sub': '減法模式 (1-20)',
+                'mul': '乘法模式 (1-9)',
+                'mix': '綜合大挑戰'
+            };
+            document.getElementById('current-mode-label').innerText = modeLabels[mode];
+
+            generateQuestion();
+        }
+
+        // 回到選單
+        function showMenu() {
+            playSound('click');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('mode-selection').classList.remove('hidden');
+        }
+
+        // 產生適合 6 歲兒童的題目
+        function generateQuestion() {
+            userInputValue = "";
+            updateAnswerUI();
+
+            let activeMode = currentMode;
+            if (activeMode === 'mix') {
+                const modes = ['add', 'sub', 'mul'];
+                activeMode = modes[Math.floor(Math.random() * modes.length)];
+            }
+
+            if (activeMode === 'add') {
+                // 加法：總和不超過 20
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * 10) + 1;
+                correctAnswer = num1 + num2;
+                document.getElementById('operator').innerText = '+';
+            } else if (activeMode === 'sub') {
+                // 減法：結果不為負數 (範圍 1-20)
+                num1 = Math.floor(Math.random() * 15) + 5;
+                num2 = Math.floor(Math.random() * num1) + 1;
+                correctAnswer = num1 - num2;
+                document.getElementById('operator').innerText = '-';
+            } else if (activeMode === 'mul') {
+                // 乘法：基礎 1-9 乘法表 (6 歲可練習簡單乘法)
+                num1 = Math.floor(Math.random() * 5) + 1; // 控制在 1-5 讓幼兒較好理解
+                num2 = Math.floor(Math.random() * 5) + 1;
+                correctAnswer = num1 * num2;
+                document.getElementById('operator').innerText = '×';
+            }
+
+            document.getElementById('num1').innerText = num1;
+            document.getElementById('num2').innerText = num2;
+
+            renderVisualHelpers(activeMode);
+        }
+
+        // 繪製視覺輔助星星點數 (Counting Helpers)
+        function renderVisualHelpers(mode) {
+            const container = document.getElementById('visual-helpers');
+            container.innerHTML = "";
+
+            if (mode === 'add') {
+                // 顯示第一組星星 + 第二組星星
+                createStarGroup(container, num1, 'bg-pink-100 text-pink-500 border-pink-300');
+                const plusSign = document.createElement('span');
+                plusSign.className = "text-2xl font-black text-gray-400 self-center px-1";
+                plusSign.innerText = "+";
+                container.appendChild(plusSign);
+                createStarGroup(container, num2, 'bg-sky-100 text-sky-500 border-sky-300');
+            } else if (mode === 'sub') {
+                // 顯示被減數星星
+                createStarGroup(container, num1, 'bg-indigo-100 text-indigo-500 border-indigo-300');
+            } else if (mode === 'mul') {
+                // 乘法：顯示 num1 組，每組有 num2 個星星
+                for (let i = 0; i < num1; i++) {
+                    createStarGroup(container, num2, 'bg-emerald-100 text-emerald-600 border-emerald-300');
+                    if (i < num1 - 1) {
+                        const sep = document.createElement('span');
+                        sep.className = "text-xl font-black text-gray-300 self-center px-1";
+                        sep.innerText = "•";
+                        container.appendChild(sep);
+                    }
+                }
+            }
+        }
+
+        // 建立單組可點擊的星星
+        function createStarGroup(parent, count, colorClass) {
+            const group = document.createElement('div');
+            group.className = "flex flex-wrap gap-1 p-2 rounded-xl border-2 " + colorClass;
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('button');
+                star.className = "w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-lg transition-transform active:scale-125";
+                star.innerText = "⭐";
+                star.onclick = function() {
+                    playSound('click');
+                    this.classList.toggle('opacity-30');
+                };
+                group.appendChild(star);
+            }
+            parent.appendChild(group);
+        }
+
+        // 數字鍵盤輸入
+        function pressNum(digit) {
+            playSound('click');
+            if (userInputValue.length < 2) {
+                userInputValue += digit.toString();
+                updateAnswerUI();
+            }
+        }
+
+        // 清除答案
+        function clearAnswer() {
+            playSound('click');
+            userInputValue = "";
+            updateAnswerUI();
+        }
+
+        // 更新答案顯示 UI
+        function updateAnswerUI() {
+            const answerBox = document.getElementById('user-answer');
+            if (userInputValue === "") {
+                answerBox.innerText = "?";
+                answerBox.classList.add('text-gray-300');
+                answerBox.classList.remove('text-indigo-600');
+            } else {
+                answerBox.innerText = userInputValue;
+                answerBox.classList.remove('text-gray-300');
+                answerBox.classList.add('text-indigo-600');
+            }
+        }
+
+        // 送出答案驗證
+        function submitAnswer() {
+            if (userInputValue === "") return;
+
+            const val = parseInt(userInputValue, 10);
+            if (val === correctAnswer) {
+                // 答對
+                playSound('correct');
+                starCount++;
+                document.getElementById('star-count').innerText = starCount;
+
+                // 每獲得 5 顆星星獎勵一枚獎牌
+                if (starCount % 5 === 0) {
+                    badgeCount++;
+                    document.getElementById('badge-count').innerText = badgeCount;
+                }
+
+                createConfetti();
+                document.getElementById('correct-modal').classList.remove('hidden');
+            } else {
+                // 答錯
+                playSound('wrong');
+                document.getElementById('wrong-modal').classList.remove('hidden');
+            }
+        }
+
+        // 關閉答錯彈窗
+        function closeWrongModal() {
+            playSound('click');
+            document.getElementById('wrong-modal').classList.add('hidden');
+            clearAnswer();
+        }
+
+        // 進入下一題
+        function nextQuestion() {
+            playSound('click');
+            document.getElementById('correct-modal').classList.add('hidden');
+            generateQuestion();
+        }
+
+        // 慶祝彩帶效果
+        function createConfetti() {
+            const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 2500);
+            }
+        }
+    </script>
+</body>
+</html>
