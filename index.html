@@ -1,450 +1,361 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>兒童趣味數學大冒險 🎈</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Comic Neue for friendly numbers and text -->
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>兒童數學小達人 - iPhone 14 Pro 20秒計時版</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- 引入 Google Fonts 圓體 -->
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Comic Neue', 'Noto Sans TC', cursive, sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
+            font-family: 'Noto Sans TC', sans-serif;
+            background: #1e1e24;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
         }
-
-        /* 活潑繽紛的背景與彈跳動畫 */
-        .bg-pattern {
-            background-color: #f0fdf4;
-            background-image: radial-gradient(#bbf7d0 2px, transparent 2px);
-            background-size: 24px 24px;
+        .fun-font {
+            font-family: 'ZCOOL KuaiLe', cursive;
         }
-
-        .btn-bounce {
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        /* iPhone 14 Pro 外框模擬 */
+        .iphone-14-pro {
+            width: 393px;
+            height: 852px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 12px #2d2d35;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .btn-bounce:active {
-            transform: scale(0.92);
-        }
-
-        .pop-in {
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .star-shine {
-            animation: spinShine 3s infinite linear;
-        }
-
-        @keyframes spinShine {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.15); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        /* 慶祝彩色屑屑動畫 */
-        .confetti {
+        /* Dynamic Island 模擬 */
+        .dynamic-island {
+            width: 120px;
+            height: 35px;
+            background-color: black;
+            border-radius: 20px;
             position: absolute;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            animation: confettiFall 2.5s ease-out forwards;
-        }
-
-        @keyframes confettiFall {
-            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
         }
     </style>
 </head>
-<body class="bg-pattern min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 text-gray-800">
+<body>
 
-    <!-- 頂部標題與積分面板 -->
-    <header class="w-full max-w-2xl flex flex-col sm:flex-row justify-between items-center bg-white rounded-3xl p-4 shadow-lg border-4 border-yellow-300 gap-4">
-        <div class="flex items-center gap-3">
-            <div class="bg-yellow-400 p-3 rounded-2xl shadow-inner text-3xl">
-                🐱
+    <!-- iPhone 14 Pro 機身容器 -->
+    <div class="iphone-14-pro p-6 pt-14 text-center select-none">
+        
+        <!-- 動態島頂部條 -->
+        <div class="dynamic-island"></div>
+
+        <!-- 可滾動的主內容區 -->
+        <div class="flex-1 flex flex-col justify-between overflow-y-auto no-scrollbar">
+            
+            <!-- 頂部資訊列：分數與紀錄 -->
+            <div class="bg-white/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-white/50 mb-3">
+                <div class="flex justify-between items-center text-xs">
+                    <div>
+                        <span class="text-gray-500 block">最高紀錄</span>
+                        <span id="highScore" class="text-base font-bold text-orange-500">0 分</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500 block">目前得分</span>
+                        <span id="currentScore" class="text-base font-bold text-green-600">0 分</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500 block">獲得星星</span>
+                        <span id="starCount" class="text-base font-bold text-yellow-500">⭐ 0</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- 標題與模式 -->
             <div>
-                <h1 class="text-2xl sm:text-3xl font-black text-indigo-600 tracking-wide">數學小探險家</h1>
-                <p class="text-sm font-bold text-gray-400">專為 6 歲打造的趣味練習</p>
+                <h1 class="fun-font text-3xl text-purple-700 drop-shadow-sm mb-1">🌟 數學小達人 🌟</h1>
+                <p class="text-gray-700 text-xs mb-3">20秒限時挑戰模式</p>
             </div>
-        </div>
 
-        <!-- 獎勵積分條 -->
-        <div class="flex items-center gap-4 bg-amber-50 px-5 py-2 rounded-2xl border-2 border-amber-200">
-            <div class="flex items-center gap-1">
-                <i class="fa-solid fa-star text-amber-400 text-3xl star-shine"></i>
-                <span id="star-count" class="text-3xl font-black text-amber-600">0</span>
+            <!-- 模式選擇按鈕 -->
+            <div class="flex justify-center gap-2 mb-3">
+                <button onclick="setMode('add')" id="btn-add" class="flex-1 py-2 rounded-xl font-bold text-xs bg-purple-600 text-white shadow transition active:scale-95">加法</button>
+                <button onclick="setMode('sub')" id="btn-sub" class="flex-1 py-2 rounded-xl font-bold text-xs bg-white/70 text-gray-700 shadow transition active:scale-95">減法</button>
+                <button onclick="setMode('mul')" id="btn-mul" class="flex-1 py-2 rounded-xl font-bold text-xs bg-white/70 text-gray-700 shadow transition active:scale-95">乘法</button>
             </div>
-            <div class="h-8 w-0.5 bg-amber-200"></div>
-            <div class="flex items-center gap-1">
-                <i class="fa-solid fa-award text-purple-500 text-3xl"></i>
-                <span id="badge-count" class="text-3xl font-black text-purple-600">0</span>
+
+            <!-- 題目卡片、計時器與視覺輔助 -->
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl p-4 mb-3 shadow-md border border-white/60">
+                
+                <!-- 20秒倒數進度條區塊 -->
+                <div class="mb-3">
+                    <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                        <span>⏳ 剩餘時間</span>
+                        <span id="timerText" class="text-purple-600">20 秒</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden border border-gray-300">
+                        <div id="timerBar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full w-full transition-all duration-1000 linear"></div>
+                    </div>
+                </div>
+
+                <!-- 題目顯示 -->
+                <div id="question" class="fun-font text-5xl text-purple-700 mb-2 tracking-wider">
+                    3 + 5 = ?
+                </div>
+                <div class="text-[11px] text-purple-400 mb-1">點擊星星輔助數數：</div>
+                <div id="visualStars" class="flex flex-wrap justify-center gap-1.5 max-h-20 overflow-y-auto p-1">
+                    <!-- 動態產生星星 -->
+                </div>
             </div>
-        </div>
-    </header>
 
-    <!-- 模式選擇畫面 (預設顯示) -->
-    <main id="mode-selection" class="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-indigo-200 my-auto text-center pop-in">
-        <h2 class="text-2xl sm:text-3xl font-black text-indigo-700 mb-6">請選擇今天的冒險模式：</h2>
-        
-        <div class="grid grid-cols-2 gap-4 sm:gap-6">
-            <button onclick="startGame('add')" class="btn-bounce bg-pink-400 hover:bg-pink-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-pink-600 flex flex-col items-center justify-center gap-2">
-                <span class="text-5xl">➕</span>
-                <span class="text-2xl font-black">加法 (1-20)</span>
-            </button>
-
-            <button onclick="startGame('sub')" class="btn-bounce bg-sky-400 hover:bg-sky-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-sky-600 flex flex-col items-center justify-center gap-2">
-                <span class="text-5xl">➖</span>
-                <span class="text-2xl font-black">減法 (1-20)</span>
-            </button>
-
-            <button onclick="startGame('mul')" class="btn-bounce bg-emerald-400 hover:bg-emerald-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-emerald-600 flex flex-col items-center justify-center gap-2">
-                <span class="text-5xl">✖️</span>
-                <span class="text-2xl font-black">乘法 (九九乘法)</span>
-            </button>
-
-            <button onclick="startGame('mix')" class="btn-bounce bg-purple-400 hover:bg-purple-500 text-white rounded-3xl p-6 shadow-lg border-b-8 border-purple-600 flex flex-col items-center justify-center gap-2">
-                <span class="text-5xl">🎲</span>
-                <span class="text-2xl font-black">綜合大挑戰</span>
-            </button>
-        </div>
-    </main>
-
-    <!-- 遊戲練習畫面 (預設隱藏) -->
-    <main id="game-screen" class="hidden w-full max-w-2xl bg-white rounded-3xl p-4 sm:p-6 shadow-xl border-4 border-indigo-200 my-auto flex-col items-center gap-6 pop-in relative overflow-hidden">
-        
-        <!-- 返回按鈕與模式提示 -->
-        <div class="w-full flex justify-between items-center">
-            <button onclick="showMenu()" class="btn-bounce bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-4 py-2 rounded-2xl flex items-center gap-2 text-lg">
-                <i class="fa-solid fa-arrow-left"></i> 換模式
-            </button>
-            <span id="current-mode-label" class="text-xl font-black text-indigo-500 bg-indigo-50 px-4 py-1 rounded-full border border-indigo-200">
-                加法模式
-            </span>
-        </div>
-
-        <!-- 題目與算式區域 -->
-        <div class="flex items-center justify-center gap-4 text-5xl sm:text-6xl font-black text-indigo-900 my-2">
-            <span id="num1" class="bg-indigo-50 px-4 py-2 rounded-2xl border-2 border-indigo-100">8</span>
-            <span id="operator" class="text-pink-500">+</span>
-            <span id="num2" class="bg-indigo-50 px-4 py-2 rounded-2xl border-2 border-indigo-100">5</span>
-            <span class="text-gray-400">=</span>
-            <div id="user-answer" class="w-20 h-20 sm:w-24 sm:h-24 bg-yellow-100 border-4 border-dashed border-yellow-400 rounded-2xl flex items-center justify-center text-yellow-700 font-black text-5xl shadow-inner">
-                ?
+            <!-- 答案輸入與提交 -->
+            <div class="flex gap-2 mb-2">
+                <input type="number" id="userAnswer" placeholder="輸入答案" class="w-full text-center text-xl font-bold py-2.5 rounded-xl border-2 border-purple-300 focus:outline-none bg-white shadow-inner">
+                <button onclick="checkAnswer()" class="bg-green-500 hover:bg-green-600 text-white font-bold px-5 rounded-xl shadow-md transition active:scale-95 text-base">確定</button>
             </div>
-        </div>
 
-        <!-- 視覺輔助點數/星星 (Counting Helpers) -->
-        <div class="w-full bg-slate-50 p-4 rounded-2xl border-2 border-slate-200 flex flex-col items-center gap-2">
-            <div class="text-sm font-bold text-gray-500 flex items-center gap-1">
-                💡 數一數小星星幫忙算算看：（可以點擊星星數數喔！）
+            <!-- 回饋提示 -->
+            <div id="feedback" class="h-6 font-bold text-sm mb-2 text-purple-700"></div>
+
+            <!-- 底部歷史紀錄區塊 -->
+            <div class="border-t border-black/10 pt-2">
+                <div class="flex justify-between text-xs text-gray-700">
+                    <button onclick="toggleHistory()" class="hover:text-purple-700 underline font-medium">📜 查看歷史紀錄</button>
+                    <button onclick="resetData()" class="hover:text-red-600 underline font-medium">🗑️ 清除紀錄</button>
+                </div>
+                
+                <div id="historyPanel" class="hidden mt-2 bg-white/80 rounded-xl p-3 text-left border border-white/50 max-h-28 overflow-y-auto text-xs">
+                    <h3 class="font-bold text-gray-700 mb-1">最近練習：</h3>
+                    <ul id="historyList" class="space-y-1 text-gray-600">
+                        <li class="text-gray-400">尚無紀錄</li>
+                    </ul>
+                </div>
             </div>
-            <div id="visual-helpers" class="flex flex-wrap justify-center gap-2 max-h-36 overflow-y-auto p-2 w-full">
-                <!-- 由 JavaScript 動態生成星星輔助點 -->
-            </div>
-        </div>
 
-        <!-- 數字鍵盤 (Numpad) -->
-        <div class="grid grid-cols-3 gap-3 w-full max-w-md">
-            <button onclick="pressNum(1)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">1</button>
-            <button onclick="pressNum(2)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">2</button>
-            <button onclick="pressNum(3)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">3</button>
-            <button onclick="pressNum(4)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">4</button>
-            <button onclick="pressNum(5)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">5</button>
-            <button onclick="pressNum(6)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">6</button>
-            <button onclick="pressNum(7)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">7</button>
-            <button onclick="pressNum(8)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">8</button>
-            <button onclick="pressNum(9)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">9</button>
-            <button onclick="clearAnswer()" class="btn-bounce bg-rose-400 hover:bg-rose-500 text-white font-black text-2xl py-4 rounded-2xl shadow-md border-b-4 border-rose-600">重填</button>
-            <button onclick="pressNum(0)" class="btn-bounce bg-indigo-500 hover:bg-indigo-600 text-white font-black text-3xl py-4 rounded-2xl shadow-md border-b-4 border-indigo-700">0</button>
-            <button onclick="submitAnswer()" class="btn-bounce bg-emerald-500 hover:bg-emerald-600 text-white font-black text-2xl py-4 rounded-2xl shadow-md border-b-4 border-emerald-700">送出</button>
-        </div>
-    </main>
-
-    <!-- 答對獎勵彈窗 -->
-    <div id="correct-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-green-400 pop-in flex flex-col items-center gap-4">
-            <div class="text-7xl animate-bounce">🎉</div>
-            <h3 class="text-3xl font-black text-green-600">太棒了！答對囉！</h3>
-            <p class="text-lg text-gray-600 font-bold">你獲得了一顆金黃星星！⭐</p>
-            <button onclick="nextQuestion()" class="btn-bounce bg-green-500 hover:bg-green-600 text-white font-black text-2xl px-8 py-3 rounded-2xl shadow-lg border-b-4 border-green-700 w-full">
-                下一題 ➔
-            </button>
         </div>
     </div>
 
-    <!-- 答錯提示彈窗 -->
-    <div id="wrong-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border-4 border-amber-400 pop-in flex flex-col items-center gap-4">
-            <div class="text-7xl">🐥</div>
-            <h3 class="text-3xl font-black text-amber-600">差一點點！</h3>
-            <p class="text-lg text-gray-600 font-bold">別擔心，試著數數看下方的小星星再算一次喔！</p>
-            <button onclick="closeWrongModal()" class="btn-bounce bg-amber-500 hover:bg-amber-600 text-white font-black text-2xl px-8 py-3 rounded-2xl shadow-lg border-b-4 border-amber-700 w-full">
-                再試一次 💪
-            </button>
-        </div>
-    </div>
-
-    <!-- 頁尾資訊 -->
-    <footer class="text-center text-xs font-bold text-gray-400 mt-4">
-        專為幼兒數學啟蒙設計 • 輕鬆無壓力學習
-    </footer>
-
+    <!-- JavaScript 邏輯區段 -->
     <script>
-        // 遊戲狀態變數
-        let currentMode = 'add'; // add, sub, mul, mix
-        let num1 = 0;
-        let num2 = 0;
-        let correctAnswer = 0;
-        let userInputValue = "";
-        let starCount = 0;
-        let badgeCount = 0;
+        // 設定與全域變數
+        let currentMode = 'add';
+        let num1 = 0, num2 = 0, correctAnswer = 0;
+        let score = 0, stars = 0, highScore = 0;
+        let historyLogs = [];
 
-        // 音效（使用 Web Audio API 生成簡單活潑音效，不需外部檔案）
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // 【修改重點】計時器變數：修改為 20 秒
+        const TOTAL_TIME = 20; 
+        let timeLeft = TOTAL_TIME;
+        let timerInterval = null;
 
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+        // 頁面載入初始化
+        window.onload = function() {
+            const savedHighScore = localStorage.getItem('math_highScore');
+            if (savedHighScore !== null) {
+                highScore = parseInt(savedHighScore);
+                document.getElementById('highScore').innerText = highScore + ' 分';
             }
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
 
-            if (type === 'correct') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-                osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            } else if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.05);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
-                osc.frequency.exponentialRampToValueAtTime(174.61, audioCtx.currentTime + 0.2); // F3
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+            const savedHistory = localStorage.getItem('math_history');
+            if (savedHistory !== null) {
+                historyLogs = JSON.parse(savedHistory);
+                updateHistoryUI();
+            }
+
+            generateQuestion();
+        };
+
+        // 啟動倒數計時器
+        function startTimer() {
+            clearInterval(timerInterval); // 清除舊的計時器
+            timeLeft = TOTAL_TIME;
+            updateTimerUI();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut(); // 時間到的處理
+                }
+            }, 1000);
+        }
+
+        // 更新計時器視覺 UI
+        function updateTimerUI() {
+            const timerText = document.getElementById('timerText');
+            const timerBar = document.getElementById('timerBar');
+            
+            timerText.innerText = `${timeLeft} 秒`;
+            const percentage = (timeLeft / TOTAL_TIME) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            // 當時間少於 5 秒時變為警告紅色
+            if (timeLeft <= 5) {
+                timerBar.className = "bg-gradient-to-r from-red-500 to-rose-600 h-full transition-all duration-1000 linear";
+                timerText.className = "text-red-600 animate-pulse font-bold";
+            } else {
+                timerBar.className = "bg-gradient-to-r from-green-400 to-emerald-500 h-full transition-all duration-1000 linear";
+                timerText.className = "text-purple-600";
             }
         }
 
-        // 開始遊戲/切換模式
-        function startGame(mode) {
-            playSound('click');
-            currentMode = mode;
-            document.getElementById('mode-selection').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('game-screen').classList.add('flex');
+        // 超時自動結算
+        function handleTimeOut() {
+            const feedback = document.getElementById('feedback');
+            const questionStr = document.getElementById('question').innerText;
             
-            // 更新模式標籤
-            const modeLabels = {
-                'add': '加法模式 (1-20)',
-                'sub': '減法模式 (1-20)',
-                'mul': '乘法模式 (1-9)',
-                'mix': '綜合大挑戰'
-            };
-            document.getElementById('current-mode-label').innerText = modeLabels[mode];
+            feedback.innerHTML = `⏰ 時間到！正確答案是 ${correctAnswer}`;
+            feedback.className = "h-6 font-bold text-sm mb-2 text-red-600";
 
+            const recordText = `⏰ ${questionStr.replace('?', '無')} (超時，應為 ${correctAnswer})`;
+            saveHistory(recordText);
+
+            setTimeout(generateQuestion, 2000);
+        }
+
+        // 切換練習模式
+        function setMode(mode) {
+            currentMode = mode;
+            ['add', 'sub', 'mul'].forEach(m => {
+                const btn = document.getElementById(`btn-${m}`);
+                if (m === mode) {
+                    btn.className = "flex-1 py-2 rounded-xl font-bold text-xs bg-purple-600 text-white shadow transition active:scale-95";
+                } else {
+                    btn.className = "flex-1 py-2 rounded-xl font-bold text-xs bg-white/70 text-gray-700 shadow transition active:scale-95";
+                }
+            });
             generateQuestion();
         }
 
-        // 回到選單
-        function showMenu() {
-            playSound('click');
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('flex');
-            document.getElementById('mode-selection').classList.remove('hidden');
-        }
-
-        // 產生適合 6 歲兒童的題目
+        // 產生出題
         function generateQuestion() {
-            userInputValue = "";
-            updateAnswerUI();
+            clearInterval(timerInterval);
+            document.getElementById('userAnswer').value = '';
+            document.getElementById('feedback').innerText = '';
 
-            let activeMode = currentMode;
-            if (activeMode === 'mix') {
-                const modes = ['add', 'sub', 'mul'];
-                activeMode = modes[Math.floor(Math.random() * modes.length)];
-            }
-
-            if (activeMode === 'add') {
-                // 加法：總和不超過 20
+            if (currentMode === 'add') {
                 num1 = Math.floor(Math.random() * 10) + 1;
                 num2 = Math.floor(Math.random() * 10) + 1;
                 correctAnswer = num1 + num2;
-                document.getElementById('operator').innerText = '+';
-            } else if (activeMode === 'sub') {
-                // 減法：結果不為負數 (範圍 1-20)
-                num1 = Math.floor(Math.random() * 15) + 5;
-                num2 = Math.floor(Math.random() * num1) + 1;
+                document.getElementById('question').innerText = `${num1} + ${num2} = ?`;
+            } else if (currentMode === 'sub') {
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * 10) + 1;
+                if (num1 < num2) [num1, num2] = [num2, num1];
                 correctAnswer = num1 - num2;
-                document.getElementById('operator').innerText = '-';
-            } else if (activeMode === 'mul') {
-                // 乘法：基礎 1-9 乘法表 (6 歲可練習簡單乘法)
-                num1 = Math.floor(Math.random() * 5) + 1; // 控制在 1-5 讓幼兒較好理解
+                document.getElementById('question').innerText = `${num1} - ${num2} = ?`;
+            } else if (currentMode === 'mul') {
+                num1 = Math.floor(Math.random() * 5) + 1;
                 num2 = Math.floor(Math.random() * 5) + 1;
                 correctAnswer = num1 * num2;
-                document.getElementById('operator').innerText = '×';
+                document.getElementById('question').innerText = `${num1} × ${num2} = ?`;
             }
 
-            document.getElementById('num1').innerText = num1;
-            document.getElementById('num2').innerText = num2;
-
-            renderVisualHelpers(activeMode);
+            renderVisualStars(num1 + num2);
+            startTimer();
         }
 
-        // 繪製視覺輔助星星點數 (Counting Helpers)
-        function renderVisualHelpers(mode) {
-            const container = document.getElementById('visual-helpers');
-            container.innerHTML = "";
-
-            if (mode === 'add') {
-                // 顯示第一組星星 + 第二組星星
-                createStarGroup(container, num1, 'bg-pink-100 text-pink-500 border-pink-300');
-                const plusSign = document.createElement('span');
-                plusSign.className = "text-2xl font-black text-gray-400 self-center px-1";
-                plusSign.innerText = "+";
-                container.appendChild(plusSign);
-                createStarGroup(container, num2, 'bg-sky-100 text-sky-500 border-sky-300');
-            } else if (mode === 'sub') {
-                // 顯示被減數星星
-                createStarGroup(container, num1, 'bg-indigo-100 text-indigo-500 border-indigo-300');
-            } else if (mode === 'mul') {
-                // 乘法：顯示 num1 組，每組有 num2 個星星
-                for (let i = 0; i < num1; i++) {
-                    createStarGroup(container, num2, 'bg-emerald-100 text-emerald-600 border-emerald-300');
-                    if (i < num1 - 1) {
-                        const sep = document.createElement('span');
-                        sep.className = "text-xl font-black text-gray-300 self-center px-1";
-                        sep.innerText = "•";
-                        container.appendChild(sep);
-                    }
-                }
-            }
-        }
-
-        // 建立單組可點擊的星星
-        function createStarGroup(parent, count, colorClass) {
-            const group = document.createElement('div');
-            group.className = "flex flex-wrap gap-1 p-2 rounded-xl border-2 " + colorClass;
-
-            for (let i = 0; i < count; i++) {
-                const star = document.createElement('button');
-                star.className = "w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-lg transition-transform active:scale-125";
-                star.innerText = "⭐";
+        // 視覺輔助星星
+        function renderVisualStars(count) {
+            const container = document.getElementById('visualStars');
+            container.innerHTML = '';
+            const totalStars = Math.min(count, 15);
+            for (let i = 0; i < totalStars; i++) {
+                const star = document.createElement('span');
+                star.innerText = '⭐';
+                star.className = 'text-lg cursor-pointer transition transform hover:scale-125';
                 star.onclick = function() {
-                    playSound('click');
-                    this.classList.toggle('opacity-30');
+                    this.style.opacity = this.style.opacity === '0.3' ? '1' : '0.3';
                 };
-                group.appendChild(star);
-            }
-            parent.appendChild(group);
-        }
-
-        // 數字鍵盤輸入
-        function pressNum(digit) {
-            playSound('click');
-            if (userInputValue.length < 2) {
-                userInputValue += digit.toString();
-                updateAnswerUI();
+                container.appendChild(star);
             }
         }
 
-        // 清除答案
-        function clearAnswer() {
-            playSound('click');
-            userInputValue = "";
-            updateAnswerUI();
-        }
+        // 檢查答案
+        function checkAnswer() {
+            const userInputValue = document.getElementById('userAnswer').value;
+            if (userInputValue === '') return;
 
-        // 更新答案顯示 UI
-        function updateAnswerUI() {
-            const answerBox = document.getElementById('user-answer');
-            if (userInputValue === "") {
-                answerBox.innerText = "?";
-                answerBox.classList.add('text-gray-300');
-                answerBox.classList.remove('text-indigo-600');
-            } else {
-                answerBox.innerText = userInputValue;
-                answerBox.classList.remove('text-gray-300');
-                answerBox.classList.add('text-indigo-600');
-            }
-        }
+            clearInterval(timerInterval);
 
-        // 送出答案驗證
-        function submitAnswer() {
-            if (userInputValue === "") return;
+            const userAnswer = parseInt(userInputValue);
+            const feedback = document.getElementById('feedback');
+            const questionStr = document.getElementById('question').innerText;
 
-            const val = parseInt(userInputValue, 10);
-            if (val === correctAnswer) {
-                // 答對
-                playSound('correct');
-                starCount++;
-                document.getElementById('star-count').innerText = starCount;
+            let isCorrect = (userAnswer === correctAnswer);
+            let recordText = "";
 
-                // 每獲得 5 顆星星獎勵一枚獎牌
-                if (starCount % 5 === 0) {
-                    badgeCount++;
-                    document.getElementById('badge-count').innerText = badgeCount;
+            if (isCorrect) {
+                score += 10;
+                stars += 1;
+                feedback.innerHTML = "🎉 太棒了！答對了！";
+                feedback.className = "h-6 font-bold text-sm mb-2 text-green-700 animate-bounce";
+                recordText = `✅ ${questionStr.replace('?', userAnswer)} (答對)`;
+
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('math_highScore', highScore);
+                    document.getElementById('highScore').innerText = highScore + ' 分';
                 }
-
-                createConfetti();
-                document.getElementById('correct-modal').classList.remove('hidden');
             } else {
-                // 答錯
-                playSound('wrong');
-                document.getElementById('wrong-modal').classList.remove('hidden');
+                feedback.innerHTML = `💪 答案是 ${correctAnswer}`;
+                feedback.className = "h-6 font-bold text-sm mb-2 text-orange-600";
+                recordText = `❌ ${questionStr.replace('?', userAnswer)} (錯，應為 ${correctAnswer})`;
             }
+
+            document.getElementById('currentScore').innerText = score + ' 分';
+            document.getElementById('starCount').innerText = '⭐ ' + stars;
+
+            saveHistory(recordText);
+            setTimeout(generateQuestion, 1500);
         }
 
-        // 關閉答錯彈窗
-        function closeWrongModal() {
-            playSound('click');
-            document.getElementById('wrong-modal').classList.add('hidden');
-            clearAnswer();
+        // 儲存與更新歷史紀錄
+        function saveHistory(recordText) {
+            historyLogs.unshift(recordText);
+            if (historyLogs.length > 15) historyLogs.pop();
+            localStorage.setItem('math_history', JSON.stringify(historyLogs));
+            updateHistoryUI();
         }
 
-        // 進入下一題
-        function nextQuestion() {
-            playSound('click');
-            document.getElementById('correct-modal').classList.add('hidden');
-            generateQuestion();
+        // 歷史紀錄 UI
+        function updateHistoryUI() {
+            const list = document.getElementById('historyList');
+            if (historyLogs.length === 0) {
+                list.innerHTML = `<li class="text-gray-400">尚無紀錄</li>`;
+                return;
+            }
+            list.innerHTML = historyLogs.map(log => `<li class="border-b border-gray-100 py-0.5">${log}</li>`).join('');
         }
 
-        // 慶祝彩帶效果
-        function createConfetti() {
-            const colors = ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-            for (let i = 0; i < 30; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
-                document.body.appendChild(confetti);
+        // 開啟/關閉歷史紀錄
+        function toggleHistory() {
+            const panel = document.getElementById('historyPanel');
+            panel.classList.toggle('hidden');
+        }
 
-                setTimeout(() => confetti.remove(), 2500);
+        // 清除資料
+        function resetData() {
+            if (confirm("確定要清除所有紀錄嗎？")) {
+                clearInterval(timerInterval);
+                localStorage.clear();
+                score = 0;
+                stars = 0;
+                highScore = 0;
+                historyLogs = [];
+                document.getElementById('currentScore').innerText = '0 分';
+                document.getElementById('starCount').innerText = '⭐ 0';
+                document.getElementById('highScore').innerText = '0 分';
+                updateHistoryUI();
+                generateQuestion();
             }
         }
     </script>
