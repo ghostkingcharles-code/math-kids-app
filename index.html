@@ -3,44 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>兒童數學小達人 - 30秒計時版</title>
+    <title>兒童數學小達人 - 音效與彩帶特效版</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- 引入 Google Fonts 圓體 -->
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
+    <!-- 【新增】引入 Canvas Confetti 慶祝彩帶特效庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: #1e1e24;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 20px;
+            padding: 16px;
         }
         .fun-font {
             font-family: 'ZCOOL KuaiLe', cursive;
         }
-        /* iPhone 14 Pro 外框模擬 */
-        .iphone-14-pro {
-            width: 393px;
-            height: 852px;
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            border-radius: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 12px #2d2d35;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center">
+
+    <!-- 主容器卡片 -->
+    <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-6 max-w-md w-full text-center border-4 border-yellow-300">
+        
+        <!-- 頂部資訊列：最高分、目前得分、獲得鍵盤 -->
+        <div class="flex justify-between items-center mb-4 bg-yellow-50 p-3 rounded-2xl border-2 border-yellow-200 text-sm">
+            <div>
+                <span class="text-xs text-gray-500 block">最高紀錄</span>
+                <span id="highScore" class="font-bold text-orange-500">0 分</span>
+            </div>
+            <div>
+                <span class="text-xs text-gray-500 block">目前得分</span>
+                <span id="currentScore" class="font-bold text-green-600">0 分</span>
+            </div>
+            <div>
+                <span class="text-xs text-gray-500 block">獲得鍵盤</span>
+                <span id="starCount" class="font-bold text-yellow-500">⌨️ 0</span>
+            </div>
+        </div>
+
+        <!-- 標題 -->
+        <h1 class="fun-font text-3xl md:text-4xl text-purple-700 mb-1 drop-shadow-sm">🌟 數學小達人 🌟</h1>
+        <p class="text-gray-600 text-xs md:text-sm mb-4">30秒思考不換題模式</p>
+
+        <!-- 模式選擇按鈕 -->
+        <div class="flex justify-center gap-2 mb-4">
+            <button onclick="setMode('add')" id="btn-add" class="flex-1 py-2 rounded-xl font-bold text-sm bg-purple-600 text-white shadow transition active:scale-95">加法</button>
+            <button onclick="setMode('sub')" id="btn-sub" class="flex-1 py-2 rounded-xl font-bold text-sm bg-gray-100 text-gray-700 shadow transition active:scale-95">減法</button>
+            <button onclick="setMode('mul')" id="btn-mul" class="flex-1 py-2 rounded-xl font-bold text-sm bg-gray-100 text-gray-700 shadow transition active:scale-95">乘法</button>
+        </div>
+
+        <!-- 題目卡片、計時器與視覺輔助 -->
+        <div class="bg-purple-50 rounded-2xl p-4 mb-4 border-2 border-purple-100">
+            
+            <!-- 30秒倒數進度條區塊 -->
+            <div class="mb-3">
+                <div class="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                    <span>⏳ 剩餘時間</span>
+                    <span id="timerText" class="text-purple-600">30 秒</span>
+                </div>
+                <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden border border-gray-300">
+                    <div id="timerBar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full w-full transition-all duration-1000 linear"></div>
+                </div>
+            </div>
+
+            <!-- 題目顯示 -->
+            <div id="question" class="fun-font text-5xl md:text-6xl text-purple-700 mb-3 tracking-wider">
+                3 + 5 = ?
+            </div>
+            <div class="text-xs text-purple-400 mb-1">點擊鍵盤來幫忙數數：</div>
+            <!-- 鍵盤圖示視覺輔助容器 -->
+            <div id="visualKeyboards" class="flex flex-wrap justify-center gap-1.5 max-h-24 overflow-y-auto p-1">
+                <!-- 動態產生鍵盤 -->
+            </div>
+        </div>
+
+        <!-- 答案輸入與提交 -->
+        <div class="flex gap-2 mb-3">
+            <input type="number" id="userAnswer" placeholder="輸入答案" class="w-full text-center text-2xl font-bold py-3 rounded-2xl border-2 border-purple-300 focus:outline-none focus:border-purple-500 bg-white shadow-inner">
+            <button onclick="checkAnswer()" class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 rounded-2xl shadow-lg transition active:scale-95 text-lg">確定</button>
+        </div>
+
+        <!-- 回饋提示 -->
+        <div id="feedback" class="h-8 font-bold text-base mb-3 text-purple-700"></div>
+
+        <!-- 底部歷史紀錄區塊 -->
+        <div class="border-t border-gray-200 pt-3">
+            <div class="flex justify-between text-xs text-gray-500">
+                <button onclick="toggleHistory()" class="hover:text-purple-700 underline font-medium">📜 查看歷史紀錄</button>
+                <button onclick="resetData()" class="hover:text-red-500 underline font-medium">🗑️ 清除紀錄</button>
+            </div>
+            
+            <div id="historyPanel" class="hidden mt-2 bg-gray-50 rounded-xl p-3 text-left border border-gray-200 max-h-32 overflow-y-auto text-xs">
+                <h3 class="font-bold text-gray-700 mb-1">最近練習：</h3>
+                <ul id="historyList" class="space-y-1 text-gray-600">
+                    <li class="text-gray-400">尚無紀錄</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript 邏輯區段 -->
+    <script>
+        // 設定與全域變數
+        let currentMode = 'add';
+        let num1 = 0, num2 = 0, correctAnswer = 0;
+        let score = 0, keyboardsCount = 0, highScore = 0;
+        let historyLogs = [];
+
+        // 時限 30 秒
+        const TOTAL_TIME = 30; 
+        let timeLeft = TOTAL_TIME;
+        let timerInterval = null;
+
+        // 頁面載入初始化
+        window.onload = function() {
+            const savedHighScore = localStorage.getItem('math_highScore');
+            if (savedHighScore !== null) {
+                highScore = parseInt(savedHighScore);
+                document.getElementById('highScore').innerText = highScore + ' 分';
+            }
+
+            const savedHistory = localStorage.getItem('math_history');
+            if (savedHistory !== null) {
+                historyLogs = JSON.parse(savedHistory);
+                updateHistoryUI();
+            }
+
+            generateQuestion();
+        };
+
+        // ----------------------------------------------------
+        // 【新增 1】 Web Audio API 答案正確音效生成器
+        // ----------------------------------------------------
+        function playSuccessSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+
+                // 播放第一個音符 (G5 / 783.99 Hz)
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(783.99, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(audioCtx.currentTime);
+                osc1.stop(audioCtx.currentTime + 0.2);
+
+                // 0.1 秒後播放第二個高音音符 (C6 / 1046.50 Hz)
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.1);
+                gain2.gain.setValueAtTime(0.4, audioCtx.currentTime + 0.1);
+                gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(audioCtx.currentTime + 0.1);
+                osc2.stop(audioCtx.currentTime + 0.4);
+            } catch (e) {
+                console.log("Web Audio API 不支援或尚未啟用播放權限");
+            }
         }
-        /* Dynamic Island 模擬 */
-        .dynamic-island {
-            width: 120px;
-            height: 35px;
-            background-color: black;
-            border-radius: 20px;
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+
+        // ----------------------------------------------------
+        // 【新增 2】 Canvas Confetti 彩帶慶祝特效發射器
+        // ----------------------------------------------------
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                // 從左右兩側同時噴射慶祝紙屑
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { x: 0.2, y: 0.6 }
+                });
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { x: 0.8, y: 0.6 }
+                });
+            }
+        }
+
+        // 啟動倒數計時器
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = TOTAL_TIME;
+            updateTimerUI();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        // 更新計時器視覺 UI
+        function updateTimerUI() {
+            const timerText = document.getElementById('timerText');
+            const timerBar = document.getElementById('timerBar');
+            
+            timerText.innerText = `${timeLeft} 秒`;
+            const percentage = (timeLeft / TOTAL_TIME) * 100;
+            timerBar.style.width = `${percentage}%`;
+
+            if (timeLeft <= 5) {
+                timerBar.className = "bg-gradient-to-r from-red-500 to-rose-600 h-full transition-all duration-1000 linear";
+                timerText.className = "text-red-600 animate-pulse font-bold";
+            } else {
+                timerBar.className = "bg-gradient-to-r from-green-400 to-emerald-500 h-full transition-all duration-1000 linear";
+                timerText.className = "text-purple-600";
+            }
+        }
+
+        // 超時處理：題目不變
+        function handleTimeOut() {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `⏰ 時間到囉！請繼續努力完成這題！`;
+            feedback.className = "h-8 font-bold text-base mb-3 text-red-600 animate-pulse";
+        }
+
+        // 切換練習模式
+        function setMode(mode) {
+            currentMode = mode;
+            ['add', 'sub', 'mul'].forEach(m => {
+                const btn = document.getElementById(`btn-${m}`);
+                if (m === mode) {
+                    btn.className = "flex-1 py-2 rounded-xl font-bold text-sm bg-purple-600 text-white shadow transition active:scale-95";
+                } else {
+                    btn.className = "flex-1 py-2 rounded-xl font-bold text-sm bg-gray-100 text-gray-700 shadow transition active:scale-95";
+                }
+            });
+            generateQuestion();
+        }
+
+        // 產生出題
+        function generateQuestion() {
+            clearInterval(timerInterval);
+            document.getElementById('userAnswer').value = '';
+            document.getElementById('feedback').innerText = '';
+
+            if (currentMode === 'add') {
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * 10) + 1;
+                correctAnswer = num1 + num2;
+                document.getElementById('question').innerText = `${num1} + ${num2} = ?`;
+            } else if (currentMode === 'sub') {
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * 10) + 1;
+                if (num1 < num2) [num1, num2] = [num2, num1];
+                correctAnswer = num1 - num2;
+                document.getElementById('question').innerText = `${num1} - ${num2} = ?`;
+            } else if (currentMode === 'mul') {
+                num1 = Math.floor(Math.random() * 5) + 1;
+                num2 = Math.floor(Math.random() * 5) + 1;
+                correctAnswer = num1 * num2;
+                document.getElementById('question').innerText = `${num1} × ${num2} = ?`;
+            }
+
+            renderVisualKeyboards(num1 + num2);
+            startTimer();
+        }
+
+        // 視覺輔助鍵盤
+        function renderVisualKeyboards(count) {
+            const container = document.getElementById('visualKeyboards');
+            container.innerHTML = '';
+            const totalKeyboards = Math.min(count, 15);
+            for (let i = 0; i < totalKeyboards; i++) {
+                const kb = document.createElement('span');
+                kb.innerText = '⌨️';
+                kb.className = 'text-xl cursor-pointer transition transform hover:scale-125';
+                kb.onclick = function() {
+                    this.style.opacity = this.style.opacity === '0.3' ? '1' : '0.3';
+                };
+                container.appendChild(kb);
+            }
+        }
+
+        // 檢查答案
+        function checkAnswer() {
+            const userInputValue = document.getElementById('userAnswer').value;
+            if (userInputValue === '') return;
+
+            clearInterval(timerInterval);
+
+            const userAnswer = parseInt(userInputValue);
+            const feedback = document.getElementById('feedback');
+            const questionStr = document.getElementById('question').innerText;
+
+            let isCorrect = (userAnswer === correctAnswer);
+            let recordText = "";
+
+            if (isCorrect) {
+                score += 10;
+                keyboardsCount += 1;
+                feedback.innerHTML = "🎉 太棒了！答對了！";
+                feedback.className = "h-8 font-bold text-base mb-3 text-green-600 animate-bounce";
+                recordText = `✅ ${questionStr.replace('?', userAnswer)} (答對)`;
+
+                // 【觸發效果】播放音效與噴射彩帶
+                playSuccessSound();
+                triggerConfetti();
+
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('math_highScore', highScore);
+                    document.getElementById('highScore').innerText = highScore + ' 分';
+                }
+            } else {
+                feedback.innerHTML = `💪 答案是 ${correctAnswer}`;
+                feedback.className = "h-8 font-bold text-base mb-3 text-orange-500";
+                recordText = `❌ ${questionStr.replace('?', userAnswer)} (錯，應為 ${correctAnswer})`;
+            }
+
+            document.getElementById('currentScore').innerText = score + ' 分';
+            document.getElementById('starCount').innerText = '⌨️ ' + keyboardsCount;
+
+            saveHistory(recordText);
+            setTimeout(generateQuestion, 1500);
+        }
+
+        // 儲存與更新歷史紀錄
+        function saveHistory(recordText) {
+            historyLogs.unshift(recordText);
+            if (historyLogs.length > 15) historyLogs.pop();
+            localStorage.setItem('math_history', JSON.stringify(historyLogs));
+            updateHistoryUI();
+        }
+
+        // 歷史紀錄 UI
+        function updateHistoryUI() {
+            const list = document.getElementById('historyList');
+            if (historyLogs.length === 0) {
+                list.innerHTML = `<li class="text-gray-400">尚無紀錄</li>`;
+                return;
+            }
+            list.innerHTML = historyLogs.map(log => `<li class="border-b border-gray-100 py-0.5">${log}</li>`).join('');
+        }
+
+        // 開啟/關閉歷史紀錄
+        function toggleHistory() {
+            const panel = document.getElementById('historyPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        // 清除資料
+        function resetData() {
+            if (confirm("確定要清除所有紀錄嗎？")) {
+                clearInterval(timerInterval);
+                localStorage.clear();
+                score = 0;
+                keyboardsCount = 0;
+                highScore = 0;
+                historyLogs = [];
+                document.getElementById('currentScore').innerText = '0 分';
+                document.getElementById('starCount').innerText = '⌨️ 0';
+                document.getElementById('highScore').innerText = '0 分';
+                updateHistoryUI();
+                generateQuestion();
+            }
+        }
+    </script>
+</body>
+</html>
